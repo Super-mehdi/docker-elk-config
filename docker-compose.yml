@@ -75,7 +75,9 @@ services:
       # Bootstrap password.
       # Used to initialize the keystore during the initial startup of
       # Elasticsearch. Ignored on subsequent runs.
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      xpack.license.self_generated.type: basic
+      xpack.security.enabled: true
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/8.18/bootstrap-checks.html
       discovery.type: single-node
@@ -89,10 +91,13 @@ services:
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
     volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:rw,Z
+      - ./logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:rw,Z
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:rw,Z
     ports:
       - 5044:5044
+      - 5045:5045
+      - 5046:5046
       - 50000:50000/tcp
       - 50000:50000/udp
       - 9600:9600
@@ -115,7 +120,13 @@ services:
     ports:
       - 5601:5601
     environment:
-      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      xpack.security.enabled: true
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: AAEAAWVsYXN0aWMva2liYW5hL21vbi10b2tlbi1raWJhbmE6bU9pS1Z4X2NUaUM1ZmVad3pYbm56dw
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      ELASTICSEARCH_SSL_VERIFICATIONMODE: none
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: CeciEstUneCleSecreteDePlusDe32Caracteres
+      XPACK_SECURITY_ENCRYPTIONKEY: CeciEstUneDeuxiemeCleDePlusDe32Caracteres
+      XPACK_REPORTING_ENCRYPTIONKEY: CeciEstUneTroisiemeCleDePlusDe32Caracteres
     networks:
       - elk
     depends_on:

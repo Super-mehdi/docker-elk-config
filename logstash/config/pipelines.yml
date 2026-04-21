@@ -1,0 +1,8 @@
+- pipeline.id: windows
+  path.config: "/usr/share/logstash/pipeline/winlogbeat.conf"
+
+- pipeline.id: linux
+  path.config: "/usr/share/logstash/pipeline/filebeat.conf"
+
+- pipeline.id: default
+  path.config: "/usr/share/logstash/pipeline/logstash.conf"
